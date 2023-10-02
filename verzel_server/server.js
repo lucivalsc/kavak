@@ -15,21 +15,7 @@ const db = pgp('postgres://postgres:912167@localhost:5432/verzel');
 // Configurar a chave secreta para o JWT
 const secretKey = 'sua_chave_secreta';
 
-// // Rotas de autenticação
-// app.post('/login', (req, res) => {
-//   const { username, password } = req.body;
-
-//   // Verifique o nome de usuário e a senha (substitua com sua lógica)
-//   if (username === 'seu_usuario' && password === 'sua_senha') {
-//     // Gere um token JWT
-//     const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
-//     res.json({ token });
-//   } else {
-//     res.status(401).json({ message: 'Credenciais inválidas' });
-//   }
-// });
-
-
+// Rotas de autenticação
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -119,14 +105,20 @@ app.get('/carros', async (req, res) => {
         const pageSize = req.query.pageSize || 10;
         const offset = (page - 1) * pageSize;
 
+        // Consulta para contar o número total de registros na tabela 'carros'
+        const totalCarros = await db.one('SELECT COUNT(*) FROM carros');
+
+        // Consulta para obter os dados paginados
         const carros = await db.any('SELECT * FROM carros LIMIT $1 OFFSET $2', [pageSize, offset]);
 
-        res.json(carros);
+        // Calcule o número total de páginas com base no número total de registros
+        const totalPages = Math.ceil(totalCarros.count / pageSize);
+
+        res.json({ carros, totalPages });
     } catch (error) {
         res.status(500).json({ message: 'Erro ao acessar o banco de dados', error: error.message });
     }
 });
-
 
 // Rota para gravar um novo carro na tabela "carros"
 app.post('/carros', verifyToken, async (req, res) => {

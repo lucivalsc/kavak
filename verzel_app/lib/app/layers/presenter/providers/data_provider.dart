@@ -28,7 +28,7 @@ class DataProvider extends ChangeNotifier {
   void setUserProvider(UserProvider provider) => userProvider = provider;
   void setAuthProvider(AuthProvider provider) => authProvider = provider;
 
-  Future<List?> responseDatas(
+  Future<Map?> responseDatas(
     BuildContext context,
     int page,
     int pageSize,
@@ -47,7 +47,7 @@ class DataProvider extends ChangeNotifier {
         );
         return null;
       },
-      (r) => r[0] as List,
+      (r) => r[0] as Map,
     );
   }
 

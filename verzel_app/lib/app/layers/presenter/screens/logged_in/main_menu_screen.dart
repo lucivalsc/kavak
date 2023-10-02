@@ -38,16 +38,21 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   //Paginação
   int offset = 1;
   final ScrollController scrollController = ScrollController();
-
+  Map? value;
   Future<void> initScreen() async {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     await Future.delayed(const Duration(milliseconds: 200));
     if (mounted) {
-      var value = await dataProvider.responseDatas(context, offset, 10) ?? [];
-      for (var i = 0; i < value.length; i++) {
-        value[i]['bytes'] =
-            appWidgets.base64ToUint8List(value[i]['foto_base64']);
-        originals1.add(value[i]);
+      value = await dataProvider.responseDatas(context, offset, 10) ?? {};
+
+      List carros = value!['carros'];
+      if (carros.isEmpty) {
+        offset = int.parse((value!['totalPages']).toString());
+      }
+      for (var i = 0; i < carros.length; i++) {
+        carros[i]['bytes'] =
+            appWidgets.base64ToUint8List(carros[i]['foto_base64']);
+        originals1.add(carros[i]);
       }
       setState(() {});
     }
@@ -109,8 +114,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  push(context, const RegisterScreen());
+                onPressed: () async {
+                  await push(context, const RegisterScreen());
+                  setState(() {});
                 },
                 icon: const Icon(
                   Icons.add,
@@ -204,7 +210,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                       TextButton(
                                         onPressed: () async {
                                           order = await push(
-                                              context, const OrderScreen());
+                                            context,
+                                            const OrderScreen(),
+                                          );
                                           if (order.isNotEmpty) {
                                             if (order['type'] == 'DESC') {
                                               filtered1.sort((a, b) =>
@@ -220,6 +228,19 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                           }
                                         },
                                         child: Text(order['titulo']),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        value != null
+                                            ? 'Página $offset de ${value!['totalPages']}'
+                                            : '',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ],
                                   ),
