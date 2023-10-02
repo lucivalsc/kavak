@@ -1,6 +1,4 @@
-import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:verzel_app/app/common/models/failure_models.dart';
 import 'package:verzel_app/app/layers/domain/usecases/auth/sign_in_usecase.dart';
 import 'package:verzel_app/app/layers/presenter/providers/config_provider.dart';
 import 'package:verzel_app/app/layers/presenter/providers/user_provider.dart';
@@ -19,23 +17,15 @@ class AuthProvider extends ChangeNotifier {
   void setUserProvider(UserProvider provider) => userProvider = provider;
   void setConfigProvider(ConfigProvider provider) => _configProvider = provider;
 
-  Future<void> signIn(
+  Future<String> signIn(
       BuildContext context, bool mounted, email, password) async {
     var value = '';
     final result = await _signInUsecase([email, password, value]);
     await _configProvider.saveLastLoggedEmail(email);
     await _configProvider.saveLastLoggedPassword(password);
 
-    if (mounted) {
-      await fold(context, result);
-    }
-  }
-
-  Future<void> fold(
-    BuildContext context,
-    Either<Failure, List<Object>> result,
-  ) async {
-    result.fold(
+    // if (mounted) {
+    return result.fold(
       (l) async {
         showFlushbar(
           context,
@@ -43,8 +33,13 @@ class AuthProvider extends ChangeNotifier {
           l.message!,
           3,
         );
+        return '';
       },
-      (r) async {},
+      (r) {
+        Map value = r[0] as Map;
+        return value['token'];
+      },
     );
+    // }
   }
 }

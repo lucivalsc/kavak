@@ -6,8 +6,6 @@ import 'package:verzel_app/app/layers/data/datasources/remote/remote_data_dataso
 
 class RemoteDataDatasourceImplementation implements IRemoteDataDatasource {
   final Map<String, String> headers = {"Content-Type": "application/json"};
-  final token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imx1Y2l2YWxzYyIsImlhdCI6MTY5NjEyMDg4NSwiZXhwIjoxNjk2MTI0NDg1fQ.blPtPV9qt6K2Q3iraqmIZ7wBNe5_bUyKhS6lMw4va6A';
 
   final IHttpClient client;
 
@@ -38,6 +36,7 @@ class RemoteDataDatasourceImplementation implements IRemoteDataDatasource {
   @override
   Future<List<Object>> newCar(List<Object> objects) async {
     final payload = objects[0] as Map<String, dynamic>?;
+    final token = objects[1] as String;
     try {
       final response = await client.post(
         url: '${Endpoints.resource}carros',
@@ -66,6 +65,7 @@ class RemoteDataDatasourceImplementation implements IRemoteDataDatasource {
   @override
   Future<List<Object>> editCar(List<Object> objects) async {
     final payload = objects[0] as Map<String, dynamic>?;
+    final token = objects[1] as String;
     try {
       final response = await client.post(
         url: '${Endpoints.resource}carros/editar',
@@ -94,6 +94,7 @@ class RemoteDataDatasourceImplementation implements IRemoteDataDatasource {
   @override
   Future<List<Object>> deleteCar(List<Object> objects) async {
     final id = objects[0] as int;
+    final token = objects[1] as String;
     try {
       final response = await client.post(
         url: '${Endpoints.resource}carros/excluir',

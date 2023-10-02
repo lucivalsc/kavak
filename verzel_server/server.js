@@ -160,9 +160,13 @@ app.post('/carros/editar', verifyToken, async (req, res) => {
 
         res.json({ message: 'Carro editado com sucesso' });
     } catch (error) {
+        // Log de erro não tratado
+        console.error('Erro não tratado ao editar o carro:', error);
+
         res.status(500).json({ message: 'Erro ao editar o carro', error: error.message });
     }
 });
+
 
 // Rota para excluir um carro pelo ID
 app.post('/carros/excluir', verifyToken, async (req, res) => {

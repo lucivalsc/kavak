@@ -34,30 +34,40 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   bool isSearchBarFocused = false;
   String searchBarText = '';
   final _debouncer = Debouncer(milliseconds: 1000);
+  GlobalKey<RefreshIndicatorState> refreshKey =
+      GlobalKey<RefreshIndicatorState>();
 
   //Paginação
   int offset = 1;
   final ScrollController scrollController = ScrollController();
   Map? value;
+
   Future<void> initScreen() async {
     dataProvider = Provider.of<DataProvider>(context, listen: false);
     await Future.delayed(const Duration(milliseconds: 200));
     if (mounted) {
       value = await dataProvider.responseDatas(context, offset, 10) ?? {};
-
-      List carros = value!['carros'];
+      final carros = (value!['carros'] as List).map((itemData) {
+        itemData['bytes'] =
+            appWidgets.base64ToUint8List(itemData['foto_base64']);
+        return itemData;
+      }).toList();
       if (carros.isEmpty) {
         offset = int.parse((value!['totalPages']).toString());
       }
-      for (var i = 0; i < carros.length; i++) {
-        carros[i]['bytes'] =
-            appWidgets.base64ToUint8List(carros[i]['foto_base64']);
-        originals1.add(carros[i]);
-      }
-      setState(() {});
+      originals1.addAll(carros);
     }
     filtered1 =
         await dataProvider.sortSyncedData(searchBarText, originals1, order);
+    setState(() {});
+  }
+
+  Future<void> refreshList() async {
+    originals1 = [];
+    filtered1 = [];
+    offset = 1;
+    value = {};
+    initScreen();
   }
 
   void _scrollListener() {
@@ -115,8 +125,13 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
               ),
               IconButton(
                 onPressed: () async {
-                  await push(context, const RegisterScreen());
-                  setState(() {});
+                  var value = await push(
+                    context,
+                    const RegisterScreen(),
+                  );
+                  if (value == true) {
+                    future = refreshList();
+                  }
                 },
                 icon: const Icon(
                   Icons.add,
@@ -199,7 +214,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        '${filtered1.length} Resultados',
+                                        '${filtered1.length} iten(s)',
                                         style: const TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey,
@@ -255,25 +270,42 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                   'Hum... Nada aqui',
                                   'Nenhuma produção foi encontrada!',
                                 )
-                              : ListView.separated(
-                                  controller: scrollController,
-                                  shrinkWrap: true,
-                                  itemCount: filtered1.length,
-                                  padding: EdgeInsets.only(
-                                      bottom: MediaQuery.of(context)
-                                          .padding
-                                          .bottom),
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 10),
-                                  itemBuilder: (context, index) {
-                                    final item = filtered1[index];
+                              : RefreshIndicator(
+                                  key: refreshKey,
+                                  onRefresh: refreshList,
+                                  child: ListView.separated(
+                                    controller: scrollController,
+                                    shrinkWrap: true,
+                                    itemCount: filtered1.length,
+                                    padding: EdgeInsets.only(
+                                        bottom: MediaQuery.of(context)
+                                            .padding
+                                            .bottom),
+                                    separatorBuilder: (_, __) =>
+                                        const SizedBox(height: 10),
+                                    itemBuilder: (context, index) {
+                                      final item = filtered1[index];
 
-                                    return CardDefault(
-                                      item: item,
-                                      appStyles: appStyles,
-                                      appWidgets: appWidgets,
-                                    );
-                                  },
+                                      return GestureDetector(
+                                        onTap: () async {
+                                          var value = await push(
+                                            context,
+                                            RegisterScreen(
+                                              registerCar: item,
+                                            ),
+                                          );
+                                          if (value == true) {
+                                            future = refreshList();
+                                          }
+                                        },
+                                        child: CardDefault(
+                                          item: item,
+                                          appStyles: appStyles,
+                                          appWidgets: appWidgets,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                         ),
                       ],

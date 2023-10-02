@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<String?> checkIfHeroIconExists(String path) async {
@@ -42,5 +43,22 @@ String capitalize(String string) {
 }
 
 Future<void> startHiveStuff() async {
-  await getApplicationDocumentsDirectory().then((directory) => Hive.init(directory.path));
+  await getApplicationDocumentsDirectory()
+      .then((directory) => Hive.init(directory.path));
+}
+
+String formatDatetime(String? date) => date != null
+    ? DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.parse(date).toLocal())
+    : '-';
+
+String formatDate(String? date) => date != null
+    ? DateFormat('dd/MM/yyyy').format(DateTime.parse(date).toLocal())
+    : '-';
+
+String formatNumber(double? number) =>
+    number?.toStringAsFixed(2).replaceAll('.', ',') ?? '0,00';
+
+String formatarValor(double valor) {
+  final formatador = NumberFormat.currency(locale: 'pt_BR', symbol: '');
+  return formatador.format(valor);
 }

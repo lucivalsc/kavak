@@ -51,8 +51,9 @@ class DataProvider extends ChangeNotifier {
     );
   }
 
-  Future<bool> newCar(BuildContext context, Map<String, dynamic> value) async {
-    final result = await newCarUsecase([value]);
+  Future<bool> newCar(
+      BuildContext context, Map<String, dynamic> value, String token) async {
+    final result = await newCarUsecase([value, token]);
     return result.fold(
       (l) async {
         showFlushbar(
@@ -68,8 +69,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<bool> editCar(
-      BuildContext context, Map<dynamic, dynamic> value) async {
-    final result = await editCarUseCase([value]);
+      BuildContext context, Map<dynamic, dynamic> value, String token) async {
+    final result = await editCarUseCase([value, token]);
     return result.fold(
       (l) async {
         showFlushbar(
@@ -84,8 +85,8 @@ class DataProvider extends ChangeNotifier {
     );
   }
 
-  Future<bool> deleteCar(BuildContext context, int value) async {
-    final result = await deleteCarUsecase([value]);
+  Future<bool> deleteCar(BuildContext context, int value, String token) async {
+    final result = await deleteCarUsecase([value, token]);
     return result.fold(
       (l) async {
         showFlushbar(

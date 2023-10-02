@@ -99,13 +99,17 @@ class _LoginState extends State<Login> {
                 }
                 setState(() => isScreenLocked = true);
                 FocusManager.instance.primaryFocus?.unfocus();
-                await authProvider.signIn(
+                var token = await authProvider.signIn(
                   context,
                   mounted,
                   userLogger.text,
                   passwordLogger.text,
                 );
                 setState(() => isScreenLocked = false);
+
+                if (mounted) {
+                  Navigator.pop(context, token);
+                }
               },
               label: "ENTRAR",
               enable: true,
