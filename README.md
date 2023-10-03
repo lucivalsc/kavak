@@ -47,3 +47,7 @@ A api poderá ser testada através do postman, existe um arquivo na pasta postma
 
 # Sobre o Aplicativo
 ## Versão do Flutter: Flutter 3.10.0 
+
+
+# Tela do app
+![photo_4962967562912640426_y](https://github.com/lucivalsc/verzel/assets/32388157/99c4c2ca-5540-4180-a148-97a65b777b2a)
