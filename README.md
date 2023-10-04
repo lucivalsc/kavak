@@ -47,6 +47,7 @@ A api poderá ser testada através do postman, existe um arquivo na pasta postma
 
 # Sobre o Aplicativo
 ## Versão do Flutter: Flutter 3.10.0 
+Alterar a rota de conexão do aplicativo com a api no arquivo lib\app\common\endpoints\endpoints.dart na linha 6:  static const resource = 'http://ip:porta/';
 
 
 # Tela do app
